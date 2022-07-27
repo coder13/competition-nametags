@@ -4,15 +4,15 @@ import routes from 'Routes';
 function LayoutComponent() {
   return (
     <div>
-      <div>
+      <header>
         Menu
         <ul>
           <li>
             <Link to={routes.home}>Home</Link>
           </li>
         </ul>
-      </div>
-      <div>
+      </header>
+      <div className="p-2 print:p-0">
         <Outlet />
       </div>
     </div>
