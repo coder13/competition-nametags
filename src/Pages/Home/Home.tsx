@@ -1,74 +1,91 @@
-import Nametag from './Nametag';
-import classNames from 'classnames';
+import { createContext, useEffect, useRef, useState } from 'react';
+import ReactToPrint, { useReactToPrint } from 'react-to-print';
 import { Competition, Person } from '@wca/helpers';
-import wcif from '../../assets/wcif.json';
+import { NametagExportWrapped, CompetitorCardExportWrapped } from '../../Components/Export';
+import Nametag from 'Components/Nametag';
+import CompetitorCard from 'Components/CompetitorCard';
 
-type BorderType = 'top' | 'left' | 'right' | 'bottom';
-const Border = ({ children, borders }: { children: React.ReactNode, borders: BorderType[] }) => {
-  return (
-    <div className={classNames('border border-dashed border-1 border-gray-300 border-collapse', {
-      'border-t-0': !borders.includes('top'),
-      'border-r-0': !borders.includes('right'),
-      'border-l-0': !borders.includes('left'),
-      'border-b-0': !borders.includes('bottom'),
-    })}>
-      {children}
-    </div>
-  );
-}
+const competitionId = 'SnoCoNxN2022';
 
-type PageProps = {
-  persons: Person[];
-}
-
-const Page = ({ persons }: PageProps) => {
-  return (
-    <div className="flex flex-col page mb-4 ">
-      <div className="flex flex-row">
-        <Border borders={['top', 'left', 'right', 'bottom']}>
-          <Nametag {...persons[0]} />
-        </Border>
-        <Border borders={['top', 'left', 'right', 'bottom']}>
-          <Nametag {...persons[1]} />
-        </Border>
-        <Border borders={['top', 'left', 'right', 'bottom']}>
-          <Nametag {...persons[2]} />
-        </Border>
-      </div>
-      <div className="flex flex-row">
-        <Border borders={['top', 'left', 'right', 'bottom']}>
-          <Nametag {...persons[3]} />
-        </Border>
-        <Border borders={['top', 'left', 'right', 'bottom']}>
-          <Nametag {...persons[4]} />
-        </Border>
-        <Border borders={['top', 'left', 'right', 'bottom']}>
-          <Nametag {...persons[5]} />
-        </Border>
-      </div>
-  </div>
-  );
-}
-
+export const WcifContext = createContext<Competition | null>(null);
 
 export default function HomePage() {
+  const [wcif, setWcif] = useState<Competition | null>(null);
+  const exportNametagsRef = useRef(null);
+  const exportCompetitorCardsRef = useRef(null);
 
-  const persons = (wcif as unknown as Competition).persons
-    .filter((person) => person.registration.status === 'accepted')
-    .sort((a,b) => a.name.localeCompare(b.name));
+  const handlePrintNametags = useReactToPrint({
+    content: () => exportNametagsRef.current,
+  });
+
+  const handlePrintCompetiorCards = useReactToPrint({
+    content: () => exportCompetitorCardsRef.current,
+  });
+
+  useEffect(() => {
+    fetch(`https://www.worldcubeassociation.org/api/v0/competitions/${competitionId}/wcif/public`)
+      .then((data) => data.json())
+      .then((data) => {
+        setWcif(data);
+      });
+  }, []);
+
+  const examplePerson: Person = {
+    name: 'Juan Antonio Orozco Lopez',
+    roles: ['Organizer'],
+    countryIso2: 'USA',
+    wcaId: '2005DOEJ01',
+    registrantId: 1,
+    wcaUserId: 1,
+    assignments: wcif?.persons[7].assignments,
+  };
+
+  if (!wcif) {
+    return;
+  }
 
   return (
-    <div>
-      <Page persons={persons.slice(0, 6)} />
-      <Page persons={persons.slice(6, 12)}  />
-      <Page persons={persons.slice(12, 18)}  />
-      <Page persons={persons.slice(18, 24)}  />
-      <Page persons={persons.slice(24, 30)}  />
-      <Page persons={persons.slice(30, 36)}  />
-      <Page persons={persons.slice(36, 42)}  />
-      <Page persons={persons.slice(42, 48)}  />
-      <Page persons={persons.slice(48, 54)}  />
-      <Page persons={persons.slice(54, 60)}  />
-    </div>
+    <WcifContext.Provider value={wcif}>
+      <div>
+        <div className="print:hidden">
+          <div className="flex flex-row space-x-4 m-4">
+            <Nametag {...examplePerson} />
+            <CompetitorCard {...examplePerson} />
+          </div>
+          <ReactToPrint content={() => exportNametagsRef.current} />
+          <ReactToPrint content={() => exportCompetitorCardsRef.current} />
+          <br />
+          <br />
+          <div className="space-x-2">
+            <button
+              onClick={handlePrintNametags}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Print Nametags
+            </button>
+            <button
+              onClick={handlePrintCompetiorCards}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Print Competitor Cards
+            </button>
+          </div>
+        </div>
+        {wcif && (
+          <NametagExportWrapped
+            ref={exportNametagsRef}
+            wcif={wcif}
+            className="print:block hidden"
+          />
+        )}
+        {wcif && (
+          <CompetitorCardExportWrapped
+            ref={exportCompetitorCardsRef}
+            wcif={wcif}
+            className="print:block hidden"
+          />
+        )}
+      </div>
+    </WcifContext.Provider>
   );
 }

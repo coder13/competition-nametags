@@ -8,7 +8,7 @@ function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path={routes.home} element={<Home />} />
+        <Route path={'/:competition_id/nametags'} element={<Home />} />
       </Route>
     </Routes>
   );

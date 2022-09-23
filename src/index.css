@@ -4,8 +4,11 @@
 
 @media print {
   /* This media query only applies itself to the page during printing */
-  header, footer, nav, .print--hide { 
-    display: none !important; 
+  header,
+  footer,
+  nav,
+  .print--hide {
+    display: none !important;
   }
 
   .page {
@@ -17,5 +20,5 @@
 
 @page {
   size: 11in 8.5in landscape;
-  margin: 1em;
+  margin: 0.45in;
 }
