@@ -9,7 +9,7 @@ const loginUrl = () => {
     client_id: 'example-application-id',
     response_type: 'token',
     redirect_uri: window.location.href,
-    scope: 'public',
+    scope: 'public manage_competitions',
     state: 'foobar',
   });
   return `https://staging.worldcubeassociation.org/oauth/authorize?${params.toString()}`;

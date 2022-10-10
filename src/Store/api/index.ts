@@ -52,7 +52,7 @@ export const api = createApi({
       query: () => {
         const params = new URLSearchParams({ managed_by_me: 'true' });
 
-        return `/competitions?${params.toString()}`;
+        return `api/v0/competitions?${params.toString()}`;
       },
     }),
   }),

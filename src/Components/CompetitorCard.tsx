@@ -1,14 +1,39 @@
 import { Activity, AssignmentCode, Competition, Person, Room, Venue } from '@wca/helpers';
 import { shortEventNameById } from 'lib/events';
-import { WcifContext } from 'Pages/Home/Home';
+import { WcifContext } from '../Pages/Competitions/Home';
 import { useContext, useMemo } from 'react';
 import { flatMap } from '../utils';
 // import QRCode from 'react-qr-code';
 
 // const WIDTH = '2.625in';
 // const HEIGHT = '3.75in';
-const WIDTH = '2.25in';
+const WIDTH = '2.625in';
 const HEIGHT = '3.5in';
+
+const Container = ({ children, className }: { className?: string; children: React.ReactNode }) => (
+  <span className={`px-[0.25rem] py-[0.25rem] rounded-md bg-blue-100 text-gray-700 ${className}`}>
+    {children}
+  </span>
+);
+
+interface AssignmentLabelProps {
+  assignmentCode: AssignmentCode;
+}
+
+function AssignmentLabel({ assignmentCode }: AssignmentLabelProps) {
+  switch (assignmentCode) {
+    case 'competitor':
+      return <Container className="bg-green-200">Competitor</Container>;
+    case 'staff-scrambler':
+      return <Container className="bg-yellow-200">Scrambler</Container>;
+    case 'staff-judge':
+      return <Container className="bg-blue-200">Judge</Container>;
+    case 'staff-runner':
+      return <Container className="bg-orange-200">Runner</Container>;
+    default:
+      return <Container>{assignmentCode}</Container>;
+  }
+}
 
 export const parseActivityCode = (activityCode: string) => {
   const [, e, r, g, a] = activityCode.match(/(\w+)(?:-r(\d+))?(?:-g(\d+))?(?:-a(\d+))?/);
@@ -89,12 +114,12 @@ export default function CompetitorCard({ registrantId, name, wcaId, assignments 
   const _assignments = useMemo(
     () =>
       assignments
-        .map((assignment) => ({
+        ?.map((assignment) => ({
           ...assignment,
           activity: _allActivities.find(({ id }) => id === assignment.activityId),
         }))
         .sort((a, b) => (a.activity && b.activity ? byDate(a.activity, b.activity) : 0))
-        .filter((assignment) => assignment.activity?.parent?.name),
+        .filter((assignment) => assignment.activity?.parent?.name) || [],
     [_allActivities, assignments]
   );
 
@@ -114,7 +139,7 @@ export default function CompetitorCard({ registrantId, name, wcaId, assignments 
           fontFamily: 'Montserrat, sans-serif',
         }}
       >
-        <div className="py-1">
+        <div className="py-1 bg-slate-50 shadow-sm">
           <div className="px-1 flex">
             <span>{name || '-'}</span>
             <div className="flex flex-grow" />
@@ -124,14 +149,18 @@ export default function CompetitorCard({ registrantId, name, wcaId, assignments 
             <span>WCA ID: {wcaId || '-'}</span>
           </div>
         </div>
-        <hr className="my-2" />
         <table>
           <thead>
-            <tr>
-              <th className="text-center">Event</th>
-              <th className="text-center">Group</th>
-              <th className="text-center">Stage</th>
-              <th className="text-left">Assignment</th>
+            <tr
+              className="text-white shadow-sm"
+              style={{
+                backgroundColor: '#1E6091',
+              }}
+            >
+              <th className="text-center px-2 py[0.325rem]">Event</th>
+              <th className="text-center px-2 py[0.325rem]">Group</th>
+              <th className="text-center px-2 py[0.325rem]">Stage</th>
+              <th className="text-center px-2 py[0.325rem]">Assignment</th>
             </tr>
           </thead>
           <tbody>
@@ -139,13 +168,39 @@ export default function CompetitorCard({ registrantId, name, wcaId, assignments 
               const { eventId, groupNumber } = parseActivityCode(assignment.activity.activityCode);
 
               return (
-                <tr key={assignment.activity.activityCode}>
-                  <td className="text-center">{shortEventNameById(eventId)}</td>
-                  <td className="text-center">{groupNumber}</td>
-                  <td className="text-center">
-                    {assignment?.activity?.parent?.room?.name.split(' ')[0]}
+                <tr
+                  key={assignment.activity.activityCode + assignment.assignmentCode}
+                  className="even:bg-slate-50"
+                >
+                  <td
+                    className="text-center px-2 py-[0.325rem]"
+                    style={{
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    {shortEventNameById(eventId)}
                   </td>
-                  <td className="text-left">{formatAssignmentCode(assignment.assignmentCode)}</td>
+                  <td
+                    className="text-center px-2 py-[0.325rem]"
+                    style={{
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    {groupNumber}
+                  </td>
+                  <td className="text-center px-2 py-[0.325rem]">
+                    <span
+                      className="text-white font-bold px-[0.25rem] py-[0.125rem] rounded"
+                      style={{
+                        backgroundColor: assignment?.activity?.parent?.room?.color,
+                      }}
+                    >
+                      {assignment?.activity?.parent?.room?.name.split(' ')[0]}
+                    </span>
+                  </td>
+                  <td className="text-center px-1 py-[0.325rem]">
+                    <AssignmentLabel assignmentCode={assignment.assignmentCode} />
+                  </td>
                 </tr>
               );
             })}

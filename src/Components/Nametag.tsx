@@ -1,15 +1,15 @@
 import { Person } from '@wca/helpers';
 // import { DefinedRole } from '@wca/helpers/lib/models/role';
 // import logo from '../assets/SnocoFavorites2022Template.png';
-import logo from '../assets/SnocoNxN2022Template.png';
+import logo from '../assets/NewKentOnTheBlock2022Template.png';
 // import { ReactComponent as NametagSvg } from '../assets/SnocoFavorites2022Template.svg';
 
 // const WIDTH = '2.625in';
 // const HEIGHT = '3.75in';
-const WIDTH = '2.25in';
+const WIDTH = '2.625in';
 const HEIGHT = '3.5in';
 
-const calcFontSize = (text: string) => `${Math.min(0.8 / Math.log10(text.length), 1)}rem`;
+const calcFontSize = (text: string) => `${Math.min(2.25 / Math.log10(text.length), 2)}rem`;
 
 // const RoleMap: Record<DefinedRole, string> = {
 //   delegate: 'Delegate',
@@ -21,6 +21,10 @@ export default function Nametag({ name, wcaId, countryIso2, roles }: Person) {
   // const role = roles?.filter(
   //   (role) => ['delegate', 'trainee-delegate', 'organizer'].indexOf(role) > -1
   // )[0] as DefinedRole;
+
+  if (!name) {
+    return null;
+  }
 
   const firstName = name.split(' ')[0];
   const lastName = name.split(' ').slice(1).join(' ');
@@ -104,13 +108,13 @@ export default function Nametag({ name, wcaId, countryIso2, roles }: Person) {
         }}
       />
       <div
-        className="flex flex-col border"
+        className="flex flex-col border text-white"
         style={{
           width: '100%',
           height: '100%',
         }}
       >
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 p-2">
           <span
             style={{
               fontSize: calcFontSize(firstName),
@@ -118,7 +122,7 @@ export default function Nametag({ name, wcaId, countryIso2, roles }: Person) {
               fontWeight: 900,
               position: 'relative',
               textAlign: 'center',
-              top: 210,
+              top: 40,
               left: 0,
               lineHeight: 1,
             }}
@@ -132,7 +136,7 @@ export default function Nametag({ name, wcaId, countryIso2, roles }: Person) {
               fontWeight: 900,
               position: 'relative',
               textAlign: 'center',
-              top: 215,
+              top: 60,
               left: 0,
               lineHeight: 1,
             }}
@@ -140,14 +144,13 @@ export default function Nametag({ name, wcaId, countryIso2, roles }: Person) {
             {lastName}
           </span>
         </div>
-        <div className="flex flex-col" style={{}}>
+        <div className="flex p-7 justify-between" style={{}}>
           <span
             style={{
-              fontSize: '0.75rem',
-              fontFamily: 'Garet, sans-serif',
+              fontSize: '1.125rem',
+              fontFamily: 'Montserrat, sans-serif',
               position: 'relative',
-              textAlign: 'center',
-              top: -30,
+              top: -50,
               left: 0,
             }}
           >
@@ -155,10 +158,10 @@ export default function Nametag({ name, wcaId, countryIso2, roles }: Person) {
           </span>
           <span
             style={{
-              fontSize: '0.75rem',
+              fontSize: '1.125rem',
+              fontFamily: 'Montserrat, sans-serif',
               position: 'relative',
-              textAlign: 'center',
-              top: -30,
+              top: -50,
               left: 0,
             }}
           >

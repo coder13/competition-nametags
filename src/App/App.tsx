@@ -1,11 +1,10 @@
 import './App.css';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Layout from './Layout';
-import Home from '../Pages/Home';
+import CompetitionHome from '../Pages/Competitions/Home';
 import { useEffect } from 'react';
 import Competitions from 'Pages/Competitions';
 import { getToken, setToken, useAppDispatch, useAppSelector } from 'Store';
-import { useGetMeQuery } from 'Store/api';
 
 function App() {
   const location = useLocation();
@@ -43,8 +42,8 @@ function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Competitions />} />
-        <Route path={'/:competition_id/nametags'} element={<Home />} />
+        <Route index element={token ? <Competitions /> : null} />
+        <Route path={'/competitions/:competition_id'} element={<CompetitionHome />} />
       </Route>
     </Routes>
   );
